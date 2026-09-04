@@ -65,7 +65,7 @@ hostname = %APPEND% gs-loc.apple.com, gs-loc-cn.apple.com, bluedot.is.autonavi.c
 }
 function stoverride(origin) {
   return String.raw`name: iOS Location Spoofer (Stateless)
-desc: "任何售卖本项目/模块的都是骗子，请立即联系退款。iOS Location Spoofer 无状态版 (Stash)"
+desc: "iOS Location Spoofer 无状态版 (Stash)"
 homepage: ${origin}
 
 http:
@@ -186,9 +186,6 @@ app.post("/tg", async (c) => {
   if (token && chatId && (cmd === "/link" || cmd === "/links" || cmd === "/start")) {
     const origin = new URL(c.req.url).origin;
     const reply =
-      "📍 iOS 虚拟定位 · 选点主页\n" + origin + "/\n\n" +
-      "▶️ 视频教程：https://youtu.be/EspuRlKWUxc\n\n" +
-      "⚠️ 免费开源，禁止售卖。若你是付款进来的，请立即联系退款——任何售卖者都是骗子。";
     await fetch("https://api.telegram.org/bot" + token + "/sendMessage", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -212,9 +209,6 @@ export default {
     let pathname = "/";
     try { pathname = new URL(request.url).pathname; } catch (e) {}
     // Telegram's webhook POST is a server-to-server call (non-CN anyway) — never geo-block /tg.
-    if (country === "CN" && pathname !== "/tg") {
-      return new Response(BLOCK_HTML, { status: 403, headers: { "Content-Type": "text/html;charset=utf-8", "Cache-Control": "no-store" } });
-    }
     // Lightweight access log — stream it live with `wrangler tail` to spot resale / abuse.
     // (No IP logged; edge-cached static fetches won't appear here, but page loads will.)
     try {
