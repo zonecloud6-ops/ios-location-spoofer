@@ -1,42 +1,15 @@
 name: Sync upstream mirror
 
-"on":
+on:
+  workflow_dispatch:
   schedule:
     - cron: '17 2 * * *'
-  workflow_dispatch: {}
-
-permissions:
-  contents: write
 
 jobs:
   sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - name: Checkout maintenance branch
-        uses: actions/checkout@v4
-        with:
-          ref: custom
-          fetch-depth: 0
-
-      - name: Sync branches and tags from upstream
-        shell: bash
-        run: |
-          set -euo pipefail
-          upstream_url='https://github.com/cyberhandyman/ios-location-spoofer.git'
-          git remote add upstream "$upstream_url"
-          git fetch upstream --prune --tags
-          upstream_sha=$(git rev-parse refs/remotes/upstream/main)
-          echo "Upstream main: $upstream_sha"
-          git push origin --force refs/remotes/upstream/main:refs/heads/main
-          mapfile -t upstream_branches < <(git for-each-ref --format='%(refname:strip=3)' refs/remotes/upstream/ | grep -v '^HEAD$')
-          for branch in "${upstream_branches[@]}"; do git push origin --force "refs/remotes/upstream/$branch:refs/heads/$branch"; done
-          mapfile -t target_branches < <(git ls-remote --heads origin | awk '{sub("refs/heads/", "", $2); print $2}')
-          for branch in "${target_branches[@]}"; do
-          if [[ "$branch" != 'custom' ]] && ! printf '%s
-' "${upstream_branches[@]}" | grep -Fxq "$branch"; then git push origin --delete "$branch"; fi
-          done
-          git push origin --force --tags
-          target_sha=$(git ls-remote origin refs/heads/main | awk '{print $1}')
-          source_sha=$(git ls-remote upstream refs/heads/main | awk '{print $1}')
-          test "$target_sha" = "$source_sha"
-          echo "Verified main SHA: $target_sha"
+      - name: Check Actions runner
+        run: echo "Actions runner is available"
